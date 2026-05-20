@@ -1,33 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getMe } from '../../api/auth'
+import { useAuth } from '../../auth/AuthContext'
 import { clearToken } from '../../api/client'
-import type { User } from '../../types/auth'
 
 export function AccountMenu() {
   const navigate = useNavigate()
-  const [user, setUser] = useState<User | null>(null)
+  const { refreshUser, user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
-
-  useEffect(() => {
-    let active = true
-
-    getMe()
-      .then((data) => {
-        if (active) {
-          setUser(data)
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setUser(null)
-        }
-      })
-
-    return () => {
-      active = false
-    }
-  }, [])
 
   const displayName = user?.fullName ?? user?.name ?? user?.email ?? 'Account'
   const initials = displayName
@@ -39,6 +18,7 @@ export function AccountMenu() {
 
   const handleLogout = () => {
     clearToken()
+    refreshUser().catch(() => undefined)
     navigate('/login')
   }
 

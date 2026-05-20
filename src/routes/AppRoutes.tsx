@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '../components/layout/AppLayout'
 import { DashboardPage } from '../pages/DashboardPage'
+import { ActivityLogsPage } from '../pages/ActivityLogsPage'
 import { LeadDetailPage } from '../pages/LeadDetailPage'
 import { LeadsPage } from '../pages/LeadsPage'
 import { LoginPage } from '../pages/LoginPage'
@@ -18,6 +19,9 @@ export function AppRoutes() {
           <Route path="leads" element={<LeadsPage />} />
           <Route path="leads/:id" element={<LeadDetailPage />} />
           <Route path="imports" element={<ImportListingsPage />} />
+          <Route element={<ProtectedRoute requireAdmin />}>
+            <Route path="activity-logs" element={<ActivityLogsPage />} />
+          </Route>
         </Route>
       </Route>
       <Route path="/" element={<Navigate to="/app/dashboard" replace />} />

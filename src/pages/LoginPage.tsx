@@ -1,6 +1,7 @@
 import { AxiosError } from 'axios'
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../auth/AuthContext'
 import { login } from '../api/auth'
 import { getToken, setToken } from '../api/client'
 import type { FormEvent } from 'react'
@@ -8,6 +9,7 @@ import type { FormEvent } from 'react'
 export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { refreshUser } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -25,6 +27,7 @@ export function LoginPage() {
     try {
       const response = await login({ email, password })
       setToken(response.token)
+      await refreshUser()
 
       const redirectTo =
         (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ??
