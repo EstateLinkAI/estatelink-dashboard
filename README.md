@@ -1,73 +1,168 @@
-# React + TypeScript + Vite
+# EstateLink Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+EstateLink Dashboard is the React frontend for EstateLink, a property lead intelligence platform. It gives analysts a protected workspace for reviewing scored property opportunities, filtering lead data, inspecting individual intelligence reports, and importing clean scraped listings into the backend pipeline.
 
-Currently, two official plugins are available:
+The backend is a Go API that handles authentication, listing import, lead normalisation, scoring, and lead retrieval.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Screenshots
 
-## React Compiler
+Screenshots are not committed yet. Add them later under `docs/screenshots/` when the UI is ready to document visually.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- JWT login flow with protected app routes.
+- Dashboard metrics for visible leads, A-grade leads, average score, and highest score.
+- Responsive lead pipeline with filters for city, postcode area, property type, source platform, and minimum score.
+- Lead detail intelligence report with property summary, investment metrics, source information, score overview, and grouped score reasons.
+- Clean listings import flow for JSON arrays and NDJSON files.
+- Import job polling for queued, processing, completed, and failed states.
+- Desktop sidebar, mobile sidebar drawer, and account dropdown menu.
+- Centralised Tailwind v4 theme tokens in `src/styles/theme.css`.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- React
+- TypeScript
+- Vite
+- Tailwind CSS v4
+- Axios
+- React Router DOM
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Getting Started
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Install dependencies:
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Create a local environment file if the API is not running on the default backend URL:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+VITE_API_BASE_URL=http://localhost:8080
 ```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview the production build:
+
+```bash
+npm run preview
+```
+
+## Environment Variables
+
+| Variable | Required | Default | Description |
+| --- | --- | --- | --- |
+| `VITE_API_BASE_URL` | No | `http://localhost:8080` | Base URL for the Go API. |
+
+## Routes
+
+| Route | Access | Description |
+| --- | --- | --- |
+| `/login` | Public | Login screen. |
+| `/app/dashboard` | Protected | Lead intelligence overview. |
+| `/app/leads` | Protected | Filterable lead pipeline. |
+| `/app/leads/:id` | Protected | Lead detail intelligence report. |
+| `/app/imports` | Protected | Clean listing JSON/NDJSON import workflow. |
+| `/` | Redirect | Redirects to `/app/dashboard`. |
+
+## Backend API Expectations
+
+The frontend currently expects these backend capabilities:
+
+```text
+POST /api/auth/login
+GET  /api/me
+GET  /api/leads
+GET  /api/leads/:id
+POST /api/imports/clean-listings
+GET  /api/imports/:jobId
+```
+
+Authentication is handled through the shared Axios client in `src/api/client.ts`. The JWT is stored in `localStorage`, attached to outgoing requests, and cleared on `401` responses.
+
+## Import Workflow
+
+The import page accepts either a JSON array:
+
+```json
+[
+  {
+    "title": "2 Bed Flat in Manchester",
+    "city": "Manchester",
+    "sourcePlatform": "Rightmove"
+  }
+]
+```
+
+Or newline-delimited JSON:
+
+```ndjson
+{"title":"2 Bed Flat in Manchester","city":"Manchester","sourcePlatform":"Rightmove"}
+{"title":"3 Bed Terrace in Leeds","city":"Leeds","sourcePlatform":"Zoopla"}
+```
+
+The frontend parses the file, sends an array of listing objects to `POST /api/imports/clean-listings`, then polls `GET /api/imports/:jobId` for progress.
+
+## Project Structure
+
+```text
+src/
+  api/                 API clients and response normalisation
+  components/
+    layout/            App shell, sidebar, topbar, account menu
+    lead/              Lead-specific UI components
+    ui/                Shared loading, empty, error, and stat components
+  pages/               Route-level screens
+  routes/              Router and protected route wrapper
+  styles/              Centralised Tailwind theme tokens
+  types/               Shared TypeScript types
+```
+
+## Design Tokens
+
+Tailwind v4 theme tokens live in:
+
+```text
+src/styles/theme.css
+```
+
+Use this file for shared design decisions such as:
+
+- font stacks
+- app background colours
+- panel and border colours
+- accent, success, warning, and danger colours
+- shared radius and shadow tokens
+
+Example token-backed utilities:
+
+```tsx
+<div className="rounded-panel border border-border-subtle bg-panel shadow-panel" />
+```
+
+## Quality Checks
+
+Run these before opening a pull request:
+
+```bash
+npm run build
+npm run lint
+```
+
+## Notes
+
+- The frontend is intentionally lightweight. It does not use Redux, Zustand, React Query, chart libraries, or auth refresh logic yet.
+- API response normalisation is defensive because backend field names may vary slightly while the product is still evolving.
+- Import screenshots should be committed as normal image assets once captured from the running app.

@@ -1,0 +1,32 @@
+@theme {
+  --font-sans: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  --color-app-bg: #07111f;
+  --color-app-bg-mid: #0b1220;
+  --color-app-bg-deep: #0f172a;
+  --color-app-text: #e5e7eb;
+
+  --color-panel: #020617;
+  --color-panel-soft: #0f172a;
+  --color-panel-muted: #111827;
+  --color-border-subtle: rgb(255 255 255 / 0.1);
+
+  --color-accent: #22d3ee;
+  --color-accent-strong: #06b6d4;
+  --color-accent-soft: rgb(34 211 238 / 0.1);
+
+  --color-success: #34d399;
+  --color-warning: #f59e0b;
+  --color-danger: #fb7185;
+
+  --radius-panel: 0.75rem;
+  --radius-control: 0.5rem;
+
+  --shadow-panel: 0 12px 40px rgb(2 6 23 / 0.28);
+}
+
+:root {
+  --app-background:
+    radial-gradient(circle at top, rgb(56 189 248 / 0.14), transparent 28%),
+    linear-gradient(180deg, var(--color-app-bg) 0%, var(--color-app-bg-mid) 45%, var(--color-app-bg-deep) 100%);
+}

@@ -4,6 +4,7 @@ import { DashboardPage } from '../pages/DashboardPage'
 import { LeadDetailPage } from '../pages/LeadDetailPage'
 import { LeadsPage } from '../pages/LeadsPage'
 import { LoginPage } from '../pages/LoginPage'
+import { ImportListingsPage } from '../pages/ImportListingsPage'
 import { ProtectedRoute } from './ProtectedRoute'
 
 export function AppRoutes() {
@@ -16,6 +17,7 @@ export function AppRoutes() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="leads" element={<LeadsPage />} />
           <Route path="leads/:id" element={<LeadDetailPage />} />
+          <Route path="imports" element={<ImportListingsPage />} />
         </Route>
       </Route>
       <Route path="/" element={<Navigate to="/app/dashboard" replace />} />
