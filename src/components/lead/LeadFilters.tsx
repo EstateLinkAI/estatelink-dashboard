@@ -39,13 +39,13 @@ export function LeadFilters({ form, onChange, onApply, onReset }: LeadFiltersPro
   }
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_12px_40px_rgba(2,6,23,0.25)]">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
+    <section className="min-w-0 rounded-2xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_12px_40px_rgba(2,6,23,0.25)] sm:p-5">
+      <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300/75">
             Filters
           </p>
-          <h3 className="mt-2 text-lg font-semibold text-white">Lead discovery criteria</h3>
+          <h3 className="mt-2 break-words text-lg font-semibold text-white">Lead discovery criteria</h3>
         </div>
 
         <div className="flex flex-wrap gap-3">
@@ -67,7 +67,7 @@ export function LeadFilters({ form, onChange, onApply, onReset }: LeadFiltersPro
       </div>
 
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <label className="block">
+        <label className="block min-w-0">
           <span className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
             City
           </span>
@@ -79,7 +79,7 @@ export function LeadFilters({ form, onChange, onApply, onReset }: LeadFiltersPro
           />
         </label>
 
-        <label className="block">
+        <label className="block min-w-0">
           <span className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
             Postcode Area
           </span>
@@ -91,7 +91,7 @@ export function LeadFilters({ form, onChange, onApply, onReset }: LeadFiltersPro
           />
         </label>
 
-        <label className="block">
+        <label className="block min-w-0">
           <span className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
             Property Type
           </span>
@@ -103,7 +103,7 @@ export function LeadFilters({ form, onChange, onApply, onReset }: LeadFiltersPro
           />
         </label>
 
-        <label className="block">
+        <label className="block min-w-0">
           <span className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
             Source Platform
           </span>
@@ -115,7 +115,7 @@ export function LeadFilters({ form, onChange, onApply, onReset }: LeadFiltersPro
           />
         </label>
 
-        <label className="block">
+        <label className="block min-w-0">
           <span className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
             Min Score
           </span>

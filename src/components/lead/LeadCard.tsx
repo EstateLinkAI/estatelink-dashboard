@@ -27,19 +27,21 @@ export function LeadCard({ lead }: LeadCardProps) {
   const subtitle = [lead.city, lead.postcodeArea, lead.propertyType].filter(Boolean).join(' / ')
   const meta = [lead.sourcePlatform, lead.bedrooms != null ? `${lead.bedrooms} bd` : undefined]
     .filter(Boolean)
-    .join(' • ')
+    .join(' / ')
 
   return (
-    <article className="rounded-2xl border border-white/10 bg-slate-950/65 p-5 transition hover:border-cyan-400/25 hover:bg-slate-950">
+    <article className="min-w-0 rounded-2xl border border-white/10 bg-slate-950/65 p-5 transition hover:border-cyan-400/25 hover:bg-slate-950">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="truncate text-lg font-semibold text-white">{title}</p>
-          <p className="mt-2 text-sm text-slate-400">{subtitle || 'Location and property metadata pending'}</p>
-          <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
+          <p className="break-words text-lg font-semibold text-white">{title}</p>
+          <p className="mt-2 break-words text-sm text-slate-400">
+            {subtitle || 'Location and property metadata pending'}
+          </p>
+          <p className="mt-1 break-words text-xs uppercase tracking-[0.16em] text-slate-500">
             {meta || 'Lead intelligence record'}
           </p>
         </div>
-        <ScorePill score={lead.score} />
+        <ScorePill score={lead.score} className="shrink-0" />
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-3">

@@ -78,20 +78,20 @@ export function LeadDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       <div>
         <Link to="/app/leads" className="text-sm text-cyan-300 transition hover:text-cyan-200">
           Back to Leads
         </Link>
       </div>
 
-      <section className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-          <div>
+      <section className="min-w-0 rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:p-6">
+        <div className="flex min-w-0 flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300/75">
               Intelligence Report
             </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
+            <h2 className="mt-3 break-words text-3xl font-semibold tracking-tight text-white">
               {lead.title ?? lead.address ?? 'Property lead details'}
             </h2>
             <p className="mt-2 text-sm text-slate-400">
@@ -106,8 +106,8 @@ export function LeadDetailPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-6">
+      <section className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        <div className="min-w-0 space-y-6">
           <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
             <h3 className="text-xl font-semibold text-white">Property summary</h3>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -153,7 +153,7 @@ export function LeadDetailPage() {
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
             <h3 className="text-xl font-semibold text-white">Score overview</h3>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">

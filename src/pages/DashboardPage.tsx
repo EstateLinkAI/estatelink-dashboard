@@ -71,14 +71,14 @@ export function DashboardPage() {
     .slice(0, 5)
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
+    <div className="min-w-0 space-y-6">
+      <section className="min-w-0 rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:p-6">
+        <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300/75">
               Overview
             </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
+            <h2 className="mt-3 break-words text-3xl font-semibold tracking-tight text-white">
               Property intelligence dashboard
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
@@ -115,10 +115,10 @@ export function DashboardPage() {
         />
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
+      <section className="min-w-0 rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h3 className="text-xl font-semibold text-white">Recent high-value leads</h3>
+          <div className="min-w-0">
+            <h3 className="break-words text-xl font-semibold text-white">Recent high-value leads</h3>
             <p className="mt-2 text-sm text-slate-400">
               High-scoring opportunities surfaced from the latest available lead set.
             </p>
@@ -131,20 +131,20 @@ export function DashboardPage() {
           </Link>
         </div>
 
-        <div className="mt-6 grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-          <div className="grid gap-4 lg:grid-cols-2">
+        <div className="mt-6 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+          <div className="grid min-w-0 gap-4 lg:grid-cols-2">
             {recentHighValue.map((lead) => (
               <LeadCard key={lead.id ?? lead.listingId ?? lead.title} lead={lead} />
             ))}
           </div>
 
-          <aside className="rounded-2xl border border-white/10 bg-slate-950/55 p-5">
+          <aside className="min-w-0 rounded-2xl border border-white/10 bg-slate-950/55 p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300/75">
               Best Current Lead
             </p>
             {recentHighValue[0] ? (
               <div className="mt-4">
-                <h4 className="text-xl font-semibold text-white">
+                <h4 className="break-words text-xl font-semibold text-white">
                   {recentHighValue[0].address ?? recentHighValue[0].title ?? 'Untitled property lead'}
                 </h4>
                 <p className="mt-3 text-sm leading-6 text-slate-400">
