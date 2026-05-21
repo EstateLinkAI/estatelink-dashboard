@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getLeadById } from '../api/leads'
 import { GradeBadge } from '../components/lead/GradeBadge'
@@ -7,6 +7,7 @@ import { ScoreReasons } from '../components/lead/ScoreReasons'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
+import { useIsMountedRef } from '../hooks/useIsMountedRef'
 import type { Lead } from '../types/lead'
 
 function formatCurrency(value?: number) {
@@ -28,6 +29,8 @@ export function LeadDetailPage() {
   const [lead, setLead] = useState<Lead | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const lastLeadIdRef = useRef<string | null>(null)
+  const isMountedRef = useIsMountedRef()
 
   useEffect(() => {
     if (!id) {
@@ -36,29 +39,32 @@ export function LeadDetailPage() {
       return
     }
 
-    let active = true
+    if (lastLeadIdRef.current === id) {
+      return
+    }
+
+    lastLeadIdRef.current = id
+
+    setLoading(true)
+    setError(null)
 
     getLeadById(id)
       .then((data) => {
-        if (active) {
+        if (isMountedRef.current) {
           setLead(data)
         }
       })
       .catch(() => {
-        if (active) {
+        if (isMountedRef.current) {
           setError('Unable to load this lead right now.')
         }
       })
       .finally(() => {
-        if (active) {
+        if (isMountedRef.current) {
           setLoading(false)
         }
       })
-
-    return () => {
-      active = false
-    }
-  }, [id])
+  }, [id, isMountedRef])
 
   if (loading) {
     return <LoadingState label="Loading lead details..." rows={4} />

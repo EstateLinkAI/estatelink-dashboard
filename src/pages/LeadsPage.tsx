@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getLeads } from '../api/leads'
 import {
   createLeadFilters,
@@ -10,6 +10,7 @@ import { LeadTable } from '../components/lead/LeadTable'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
+import { useIsMountedRef } from '../hooks/useIsMountedRef'
 import type { Lead, LeadsFilters } from '../types/lead'
 
 export function LeadsPage() {
@@ -18,33 +19,37 @@ export function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const lastFetchKeyRef = useRef<string | null>(null)
+  const isMountedRef = useIsMountedRef()
 
   useEffect(() => {
-    let active = true
+    const fetchKey = JSON.stringify(appliedFilters)
+    if (lastFetchKeyRef.current === fetchKey) {
+      return
+    }
+
+    lastFetchKeyRef.current = fetchKey
+
     setLoading(true)
     setError(null)
 
     getLeads(appliedFilters)
       .then((data) => {
-        if (active) {
+        if (isMountedRef.current) {
           setLeads(data)
         }
       })
       .catch(() => {
-        if (active) {
+        if (isMountedRef.current) {
           setError('Unable to load leads with the current filters.')
         }
       })
       .finally(() => {
-        if (active) {
+        if (isMountedRef.current) {
           setLoading(false)
         }
       })
-
-    return () => {
-      active = false
-    }
-  }, [appliedFilters])
+  }, [appliedFilters, isMountedRef])
 
   const applyFilters = () => {
     setAppliedFilters(createLeadFilters(form))
