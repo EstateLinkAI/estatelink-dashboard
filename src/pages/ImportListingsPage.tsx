@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { Link } from 'react-router-dom'
 import {
   getImportJob,
@@ -6,6 +6,7 @@ import {
   type ImportJob,
   type StartImportResult,
 } from '../api/imports'
+import { useIsMountedRef } from '../hooks/useIsMountedRef'
 
 function parseListingsFile(text: string): unknown[] {
   const trimmed = text.trim()
@@ -32,6 +33,9 @@ export function ImportListingsPage() {
   const [error, setError] = useState('')
   const [startResult, setStartResult] = useState<StartImportResult | null>(null)
   const [job, setJob] = useState<ImportJob | null>(null)
+  const lastPolledJobIdRef = useRef<string | null>(null)
+  const activeJobIdRef = useRef<string | null>(null)
+  const isMountedRef = useIsMountedRef()
 
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     setError('')
@@ -71,15 +75,24 @@ export function ImportListingsPage() {
 
   useEffect(() => {
     if (!startResult?.jobId) return
+    const jobId = startResult.jobId
 
-    let cancelled = false
+    if (lastPolledJobIdRef.current === jobId) {
+      return
+    }
+
+    lastPolledJobIdRef.current = jobId
+    activeJobIdRef.current = jobId
+
     let timeoutId: number | undefined
 
     async function pollJob() {
       try {
-        const latestJob = await getImportJob(startResult!.jobId)
+        const latestJob = await getImportJob(jobId)
 
-        if (cancelled) return
+        if (!isMountedRef.current || activeJobIdRef.current !== jobId) {
+          return
+        }
 
         setJob(latestJob)
 
@@ -92,7 +105,7 @@ export function ImportListingsPage() {
 
         timeoutId = window.setTimeout(pollJob, 1500)
       } catch {
-        if (!cancelled) {
+        if (isMountedRef.current && activeJobIdRef.current === jobId) {
           setError('Could not fetch import job status.')
         }
       }
@@ -101,13 +114,11 @@ export function ImportListingsPage() {
     pollJob()
 
     return () => {
-      cancelled = true
-
       if (timeoutId) {
         window.clearTimeout(timeoutId)
       }
     }
-  }, [startResult])
+  }, [isMountedRef, startResult])
 
   const total = job?.totalCount ?? startResult?.total ?? 0
   const processed = job?.processedCount ?? 0

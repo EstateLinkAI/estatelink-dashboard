@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getLeads } from '../api/leads'
 import { GradeBadge } from '../components/lead/GradeBadge'
@@ -7,6 +7,7 @@ import { ScorePill } from '../components/lead/ScorePill'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { StatCard } from '../components/ui/StatCard'
+import { useIsMountedRef } from '../hooks/useIsMountedRef'
 import type { Lead } from '../types/lead'
 
 function formatYield(value?: number) {
@@ -18,32 +19,37 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [updatedAt, setUpdatedAt] = useState<string | null>(null)
+  const hasFetched = useRef(false)
+  const isMountedRef = useIsMountedRef()
 
   useEffect(() => {
-    let active = true
+    if (hasFetched.current) {
+      return
+    }
+
+    hasFetched.current = true
+
+    setLoading(true)
+    setError(null)
 
     getLeads()
       .then((data) => {
-        if (active) {
+        if (isMountedRef.current) {
           setLeads(data)
           setUpdatedAt(new Date().toLocaleString('en-GB'))
         }
       })
       .catch(() => {
-        if (active) {
+        if (isMountedRef.current) {
           setError('Unable to load dashboard metrics right now.')
         }
       })
       .finally(() => {
-        if (active) {
+        if (isMountedRef.current) {
           setLoading(false)
         }
       })
-
-    return () => {
-      active = false
-    }
-  }, [])
+  }, [isMountedRef])
 
   if (loading) {
     return <LoadingState label="Loading dashboard metrics..." rows={4} />
