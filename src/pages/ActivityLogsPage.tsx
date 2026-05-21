@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AxiosError } from 'axios'
 import { getActivityLogs } from '../api/activityLogs'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
+import { useIsMountedRef } from '../hooks/useIsMountedRef'
 import type { ActivityLog } from '../types/activityLog'
 
 const PAGE_SIZE = 50
@@ -81,22 +82,29 @@ export function ActivityLogsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [hasMore, setHasMore] = useState(false)
+  const lastFetchKeyRef = useRef<string | null>(null)
+  const isMountedRef = useIsMountedRef()
 
   useEffect(() => {
-    let active = true
+    const fetchKey = `${PAGE_SIZE}:${offset}`
+    if (lastFetchKeyRef.current === fetchKey) {
+      return
+    }
+
+    lastFetchKeyRef.current = fetchKey
 
     setLoading(true)
     setError(null)
 
     getActivityLogs(PAGE_SIZE, offset)
       .then((data) => {
-        if (active) {
+        if (isMountedRef.current) {
           setLogs(data.logs)
           setHasMore(data.hasMore)
         }
       })
       .catch((err) => {
-        if (!active) {
+        if (!isMountedRef.current) {
           return
         }
 
@@ -110,15 +118,11 @@ export function ActivityLogsPage() {
         setHasMore(false)
       })
       .finally(() => {
-        if (active) {
+        if (isMountedRef.current) {
           setLoading(false)
         }
       })
-
-    return () => {
-      active = false
-    }
-  }, [offset])
+  }, [offset, isMountedRef])
 
   return (
     <div className="min-w-0 space-y-6">
