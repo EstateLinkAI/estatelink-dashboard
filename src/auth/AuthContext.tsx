@@ -1,4 +1,13 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import { getMe } from '../api/auth'
 import { getToken } from '../api/client'
 import type { User } from '../types/auth'
@@ -15,8 +24,9 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(() => Boolean(getToken()))
+  const hasBootstrapped = useRef(false)
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     if (!getToken()) {
       setUser(null)
       setIsLoading(false)
@@ -33,14 +43,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
+    if (hasBootstrapped.current) {
+      return
+    }
+
+    hasBootstrapped.current = true
+
     refreshUser().catch(() => {
       setUser(null)
       setIsLoading(false)
     })
-  }, [])
+  }, [refreshUser])
 
   const value = useMemo<AuthContextValue>(
     () => ({
