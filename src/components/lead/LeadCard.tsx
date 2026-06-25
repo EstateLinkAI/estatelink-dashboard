@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import type { Lead } from '../../types/lead'
 import { GradeBadge } from './GradeBadge'
 import { ScorePill } from './ScorePill'
+import { StrategyBadges } from './StrategyBadges'
 
 interface LeadCardProps {
   lead: Lead
@@ -51,6 +52,8 @@ export function LeadCard({ lead }: LeadCardProps) {
           <span className="text-sm text-slate-400">Price {formatCurrency(lead.price)}</span>
         ) : null}
       </div>
+
+      <StrategyBadges lead={lead} className="mt-4" />
 
       <div className="mt-5">
         <Link to={href} className="text-sm font-medium text-cyan-300 transition hover:text-cyan-200">

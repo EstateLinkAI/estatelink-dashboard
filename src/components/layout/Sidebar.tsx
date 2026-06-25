@@ -1,19 +1,12 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
-import { isAdminRole } from '../../auth/roles'
-
-export const navItems = [
-  { label: 'Dashboard', to: '/app/dashboard' },
-  { label: 'Leads', to: '/app/leads' },
-  { label: 'Import Listings', to: '/app/imports' },
-  { label: 'Activity Logs', to: '/app/activity-logs', adminOnly: true },
-]
+import { isNavItemVisible, navItems } from './navItems'
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(true)
   const { user } = useAuth()
-  const visibleNavItems = navItems.filter((item) => !item.adminOnly || isAdminRole(user?.role))
+  const visibleNavItems = navItems.filter((item) => isNavItemVisible(item, user?.role))
 
   return (
     <aside

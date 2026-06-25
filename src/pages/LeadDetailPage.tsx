@@ -4,11 +4,12 @@ import { getLeadById } from '../api/leads'
 import { GradeBadge } from '../components/lead/GradeBadge'
 import { ScorePill } from '../components/lead/ScorePill'
 import { ScoreReasons } from '../components/lead/ScoreReasons'
+import { StrategyScoreCard } from '../components/lead/StrategyScoreCard'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { useIsMountedRef } from '../hooks/useIsMountedRef'
-import type { Lead } from '../types/lead'
+import { STRATEGY_TYPES, type Lead } from '../types/lead'
 
 function formatCurrency(value?: number) {
   return value != null
@@ -198,6 +199,24 @@ export function LeadDetailPage() {
               <ScoreReasons reasons={lead.reasons} raw={lead.reasonsRaw ?? lead.reasons} />
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="min-w-0 rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:p-6">
+        <h3 className="text-xl font-semibold text-white">Strategy scores</h3>
+        <p className="mt-2 text-sm leading-6 text-slate-400">
+          Investment strategy breakdown for this listing across acquisition models.
+        </p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {STRATEGY_TYPES.map((strategy) => (
+            <StrategyScoreCard
+              key={strategy}
+              strategy={strategy}
+              score={lead.strategyScores.find(
+                (item) => item.strategy?.trim().toLowerCase() === strategy,
+              )}
+            />
+          ))}
         </div>
       </section>
     </div>

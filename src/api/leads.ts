@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import type { Lead, LeadsFilters } from '../types/lead'
+import type { Lead, LeadsFilters, StrategyScore } from '../types/lead'
 
 function asRecord(value: unknown): Record<string, unknown> | undefined {
   return value && typeof value === 'object' ? (value as Record<string, unknown>) : undefined
@@ -73,12 +73,42 @@ function pickReasons(record: Record<string, unknown>) {
   }
 }
 
+function normalizeStrategyScore(data: unknown): StrategyScore {
+  const record = asRecord(data) ?? {}
+  const { reasons, reasonsRaw } = pickReasons(record)
+
+  return {
+    id: asString(record.id) ?? (record.id != null ? String(record.id) : undefined),
+    listingId:
+      asString(record.listingId) ??
+      asString(record.listing_id) ??
+      (record.listingId != null ? String(record.listingId) : undefined),
+    strategy: asString(record.strategy) ?? asString(record.strategyType) ?? asString(record.strategy_type),
+    score: asNumber(record.score),
+    grade: asString(record.grade) ?? asString(record.scoreGrade) ?? asString(record.score_grade),
+    reasons,
+    reasonsRaw,
+    createdAt: asString(record.createdAt) ?? asString(record.created_at),
+  }
+}
+
+function extractStrategyScores(record: Record<string, unknown>): unknown[] {
+  const listValue =
+    record.strategyScores ??
+    record.strategy_scores ??
+    record.strategies ??
+    record.scores
+
+  return Array.isArray(listValue) ? listValue : []
+}
+
 export function normalizeLead(data: unknown): Lead {
   const record = asRecord(data) ?? {}
   const location = asRecord(record.location)
   const property = asRecord(record.property)
   const listing = asRecord(record.listing)
   const { reasons, reasonsRaw } = pickReasons(record)
+  const strategyScores = extractStrategyScores(record).map(normalizeStrategyScore)
 
   const idValue = record.id ?? record.leadId ?? record.lead_id ?? record.listingId ?? record.listing_id
   const listingIdValue = record.listingId ?? record.listing_id ?? listing?.id
@@ -123,6 +153,7 @@ export function normalizeLead(data: unknown): Lead {
     yield: asNumber(record.yield) ?? asNumber(record.rentalYield) ?? asNumber(record.rental_yield),
     reasons,
     reasonsRaw,
+    strategyScores,
     raw: record,
   }
 }
