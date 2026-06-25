@@ -198,8 +198,6 @@ function normalizeScoreReasons(value: unknown): NormalizedScoreReason[] {
 }
 
 export function ScoreReasons({ reasons, raw }: ScoreReasonsProps) {
-  console.log('RAW SCORE REASONS:', reasons)
-
   const items =
     normalizeScoreReasons(raw).length > 0
       ? normalizeScoreReasons(raw)

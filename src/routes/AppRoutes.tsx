@@ -18,7 +18,9 @@ export function AppRoutes() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="leads" element={<LeadsPage />} />
           <Route path="leads/:id" element={<LeadDetailPage />} />
-          <Route path="imports" element={<ImportListingsPage />} />
+          <Route element={<ProtectedRoute requireManage />}>
+            <Route path="imports" element={<ImportListingsPage />} />
+          </Route>
           <Route element={<ProtectedRoute requireAdmin />}>
             <Route path="activity-logs" element={<ActivityLogsPage />} />
           </Route>

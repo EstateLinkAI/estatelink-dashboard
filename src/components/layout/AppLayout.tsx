@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
-import { isAdminRole } from '../../auth/roles'
 import { AccountMenu } from './AccountMenu'
-import { navItems, Sidebar } from './Sidebar'
+import { isNavItemVisible, navItems } from './navItems'
+import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 
 function MobileNavbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const { user } = useAuth()
-  const visibleNavItems = navItems.filter((item) => !item.adminOnly || isAdminRole(user?.role))
+  const visibleNavItems = navItems.filter((item) => isNavItemVisible(item, user?.role))
 
   return (
     <>

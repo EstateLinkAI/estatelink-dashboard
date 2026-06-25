@@ -1,7 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom'
-import type { Lead } from '../../types/lead'
+import { STRATEGY_LABELS, type Lead } from '../../types/lead'
 import { GradeBadge } from './GradeBadge'
 import { ScorePill } from './ScorePill'
+import { StrategyBadges } from './StrategyBadges'
 
 interface LeadTableProps {
   leads: Lead[]
@@ -23,6 +24,12 @@ function formatYield(value?: number) {
 
 function leadHref(lead: Lead) {
   return `/app/leads/${lead.id ?? lead.listingId ?? ''}`
+}
+
+function bestStrategy(lead: Lead) {
+  return [...lead.strategyScores]
+    .filter((item) => item.score != null)
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0]
 }
 
 export function LeadTable({ leads }: LeadTableProps) {
@@ -80,6 +87,8 @@ export function LeadTable({ leads }: LeadTableProps) {
                   View details
                 </span>
               </div>
+
+              <StrategyBadges lead={lead} className="mt-3" />
             </Link>
           )
         })}
@@ -89,17 +98,18 @@ export function LeadTable({ leads }: LeadTableProps) {
         <table className="w-full table-fixed">
           <thead>
             <tr className="border-b border-white/10 text-left text-[11px] uppercase tracking-[0.14em] text-slate-500">
-              <th className="w-[24%] px-4 py-3 font-medium">Property</th>
-              <th className="w-[10%] px-3 py-3 font-medium">City</th>
-              <th className="hidden w-[9%] px-3 py-3 font-medium 2xl:table-cell">Postcode</th>
-              <th className="w-[12%] px-3 py-3 font-medium">Type</th>
-              <th className="hidden w-[11%] px-3 py-3 font-medium 2xl:table-cell">Source</th>
-              <th className="w-[11%] px-3 py-3 font-medium">Price</th>
-              <th className="hidden w-[6%] px-3 py-3 font-medium 2xl:table-cell">Beds</th>
-              <th className="w-[8%] px-3 py-3 font-medium">Score</th>
-              <th className="w-[8%] px-3 py-3 font-medium">Grade</th>
-              <th className="hidden w-[7%] px-3 py-3 font-medium 2xl:table-cell">Yield</th>
-              <th className="w-[10%] px-4 py-3 font-medium">Details</th>
+              <th className="w-[20%] px-4 py-3 font-medium">Property</th>
+              <th className="w-[9%] px-3 py-3 font-medium">City</th>
+              <th className="hidden w-[8%] px-3 py-3 font-medium 2xl:table-cell">Postcode</th>
+              <th className="w-[10%] px-3 py-3 font-medium">Type</th>
+              <th className="hidden w-[10%] px-3 py-3 font-medium 2xl:table-cell">Source</th>
+              <th className="w-[10%] px-3 py-3 font-medium">Price</th>
+              <th className="hidden w-[5%] px-3 py-3 font-medium 2xl:table-cell">Beds</th>
+              <th className="w-[7%] px-3 py-3 font-medium">Score</th>
+              <th className="w-[7%] px-3 py-3 font-medium">Grade</th>
+              <th className="hidden w-[6%] px-3 py-3 font-medium 2xl:table-cell">Yield</th>
+              <th className="w-[13%] px-3 py-3 font-medium">Top Strategy</th>
+              <th className="w-[9%] px-4 py-3 font-medium">Details</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/6">
@@ -137,6 +147,13 @@ export function LeadTable({ leads }: LeadTableProps) {
                     <GradeBadge grade={lead.grade} />
                   </td>
                   <td className="hidden px-3 py-4 2xl:table-cell">{formatYield(lead.yield)}</td>
+                  <td className="truncate px-3 py-4">
+                    {(() => {
+                      const top = bestStrategy(lead)
+                      if (!top?.strategy) return 'N/A'
+                      return `${STRATEGY_LABELS[top.strategy as keyof typeof STRATEGY_LABELS] ?? top.strategy} (${top.score?.toFixed(0)})`
+                    })()}
+                  </td>
                   <td className="px-4 py-4">
                     <Link
                       to={href}
