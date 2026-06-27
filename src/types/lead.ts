@@ -49,6 +49,8 @@ export interface Lead {
   score?: number
   grade?: string
   yield?: number
+  rentalEstimate?: number
+  daysOnMarket?: number
   reasons: string[]
   reasonsRaw?: unknown
   strategyScores: StrategyScore[]

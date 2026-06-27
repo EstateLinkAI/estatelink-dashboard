@@ -33,98 +33,88 @@ export function createLeadFilters(form: LeadFilterFormState): LeadsFilters {
   }
 }
 
+const inputClasses =
+  'w-full rounded-sm border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+
+const labelClasses = 'mb-1.5 block text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500'
+
 export function LeadFilters({ form, onChange, onApply, onReset }: LeadFiltersProps) {
   const updateField = (field: keyof LeadFilterFormState, value: string) => {
     onChange({ ...form, [field]: value })
   }
 
   return (
-    <section className="min-w-0 rounded-2xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_12px_40px_rgba(2,6,23,0.25)] sm:p-5">
-      <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300/75">
-            Filters
-          </p>
-          <h3 className="mt-2 break-words text-lg font-semibold text-white">Lead discovery criteria</h3>
-        </div>
+    <section className="min-w-0 rounded-md border border-slate-200 bg-white p-4 sm:p-5">
+      <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <h3 className="text-sm font-semibold text-slate-900">Screening criteria</h3>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={onApply}
-            className="rounded-lg border border-cyan-400/30 bg-cyan-400/90 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            className="rounded-sm bg-blue-700 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-blue-800"
           >
-            Apply Filters
+            Apply filters
           </button>
           <button
             type="button"
             onClick={onReset}
-            className="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:border-white/20 hover:bg-white/10"
+            className="rounded-sm border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
           >
-            Reset Filters
+            Reset
           </button>
         </div>
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         <label className="block min-w-0">
-          <span className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
-            City
-          </span>
+          <span className={labelClasses}>City</span>
           <input
             value={form.city}
             onChange={(event) => updateField('city', event.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
+            className={inputClasses}
             placeholder="Manchester"
           />
         </label>
 
         <label className="block min-w-0">
-          <span className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
-            Postcode Area
-          </span>
+          <span className={labelClasses}>Postcode area</span>
           <input
             value={form.postcodeArea}
             onChange={(event) => updateField('postcodeArea', event.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
+            className={inputClasses}
             placeholder="M1"
           />
         </label>
 
         <label className="block min-w-0">
-          <span className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
-            Property Type
-          </span>
+          <span className={labelClasses}>Property type</span>
           <input
             value={form.propertyType}
             onChange={(event) => updateField('propertyType', event.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
+            className={inputClasses}
             placeholder="Flat"
           />
         </label>
 
         <label className="block min-w-0">
-          <span className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
-            Source Platform
-          </span>
+          <span className={labelClasses}>Source platform</span>
           <input
             value={form.sourcePlatform}
             onChange={(event) => updateField('sourcePlatform', event.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
+            className={inputClasses}
             placeholder="Rightmove"
           />
         </label>
 
         <label className="block min-w-0">
-          <span className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
-            Min Score
-          </span>
+          <span className={labelClasses}>Min score</span>
           <input
             type="number"
             min="0"
             value={form.minScore}
             onChange={(event) => updateField('minScore', event.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/40"
+            className={inputClasses}
             placeholder="70"
           />
         </label>

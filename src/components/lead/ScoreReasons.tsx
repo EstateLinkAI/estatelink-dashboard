@@ -213,29 +213,19 @@ export function ScoreReasons({ reasons, raw }: ScoreReasonsProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="divide-y divide-slate-200 rounded-md border border-slate-200">
       {items.map((reason, index) => (
-        <div
-          key={`${reason.code ?? reason.title}-${index}`}
-          className="rounded-xl border border-slate-800 bg-slate-950 p-4"
-        >
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-cyan-300" />
-                <h4 className="text-sm font-semibold text-white">{reason.title}</h4>
-              </div>
-              {reason.message ? (
-                <p className="mt-2 pl-4 text-sm leading-6 text-slate-300">{reason.message}</p>
-              ) : null}
-            </div>
-
-            {reason.points != null ? (
-              <div className="shrink-0 rounded-lg border border-cyan-900 bg-cyan-950/50 px-3 py-1.5 text-sm font-semibold text-cyan-200">
-                +{reason.points} pts
-              </div>
-            ) : null}
+        <div key={`${reason.code ?? reason.title}-${index}`} className="flex items-start justify-between gap-3 p-3">
+          <div className="min-w-0">
+            <h4 className="text-sm font-medium text-slate-900">{reason.title}</h4>
+            {reason.message ? <p className="mt-1 text-sm leading-5 text-slate-500">{reason.message}</p> : null}
           </div>
+
+          {reason.points != null ? (
+            <span className="shrink-0 rounded-sm border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-xs font-semibold text-blue-800">
+              +{reason.points}
+            </span>
+          ) : null}
         </div>
       ))}
     </div>

@@ -11,8 +11,8 @@ export function Sidebar() {
   return (
     <aside
       className={[
-        'hidden max-w-full shrink-0 border-white/10 bg-slate-950/80 p-4 backdrop-blur transition-all duration-200 md:block md:border-r',
-        isOpen ? 'md:w-72 md:min-w-72 md:max-w-72' : 'md:w-20 md:min-w-20 md:max-w-20',
+        'hidden max-w-full shrink-0 border-slate-200 bg-white p-4 transition-all duration-150 md:block md:border-r',
+        isOpen ? 'md:w-64 md:min-w-64 md:max-w-64' : 'md:w-[72px] md:min-w-[72px] md:max-w-[72px]',
       ].join(' ')}
     >
       <div
@@ -24,24 +24,24 @@ export function Sidebar() {
         <div
           className={[
             'min-w-0',
-            isOpen ? '' : 'hidden md:flex md:h-11 md:w-11 md:items-center md:justify-center md:rounded-xl md:border md:border-cyan-400/20 md:bg-cyan-400/10',
+            isOpen
+              ? ''
+              : 'hidden md:flex md:h-10 md:w-10 md:items-center md:justify-center md:rounded-md md:border md:border-blue-200 md:bg-blue-50',
           ].join(' ')}
         >
           <p
             className={[
-              'font-semibold uppercase text-cyan-300/80',
-              isOpen ? 'text-[11px] tracking-[0.3em]' : 'text-sm tracking-normal',
+              'font-semibold uppercase text-blue-700',
+              isOpen ? 'text-[11px] tracking-[0.22em]' : 'text-sm tracking-normal',
             ].join(' ')}
           >
             {isOpen ? 'EstateLink' : 'EL'}
           </p>
           {isOpen && (
             <>
-              <h1 className="mt-3 text-2xl font-semibold text-white">
-                Property Intelligence
-              </h1>
-              <p className="mt-2 max-w-xs text-sm leading-6 text-slate-400">
-                Analyst workspace for ranking acquisition and investment opportunities.
+              <h1 className="mt-3 text-lg font-semibold text-slate-900">Property Intelligence</h1>
+              <p className="mt-2 max-w-xs text-xs leading-5 text-slate-500">
+                Ranked acquisition opportunities and due diligence workspace.
               </p>
             </>
           )}
@@ -53,7 +53,7 @@ export function Sidebar() {
           aria-expanded={isOpen}
           aria-label={isOpen ? 'Close sidebar' : 'Open sidebar'}
           className={[
-            'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-sm font-semibold text-slate-200 transition hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-100',
+            'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white text-sm font-medium text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700',
             isOpen ? 'ml-auto' : 'ml-auto md:ml-0',
           ].join(' ')}
         >
@@ -63,7 +63,7 @@ export function Sidebar() {
 
       <nav
         className={[
-          'mt-6 gap-2 md:mt-10 md:flex-col',
+          'mt-6 gap-1 md:mt-8 md:flex-col',
           isOpen ? 'grid grid-cols-1 sm:grid-cols-3 md:flex' : 'hidden md:flex',
         ].join(' ')}
       >
@@ -74,32 +74,24 @@ export function Sidebar() {
             title={isOpen ? undefined : item.label}
             className={({ isActive }) =>
               [
-                'group rounded-xl border text-sm font-medium transition',
-                isOpen ? 'px-4 py-3' : 'flex h-11 w-11 items-center justify-center px-0 py-0',
+                'group rounded-md border text-sm font-medium transition',
+                isOpen ? 'px-3 py-2.5' : 'flex h-10 w-10 items-center justify-center px-0 py-0',
                 isActive
-                  ? 'border-cyan-400/35 bg-cyan-400/10 text-cyan-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]'
-                  : 'border-white/5 bg-transparent text-slate-400 hover:border-white/10 hover:bg-white/[0.03] hover:text-white',
+                  ? 'border-blue-200 bg-blue-50 text-blue-700'
+                  : 'border-transparent bg-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-900',
               ].join(' ')
             }
           >
-            <div
-              className={[
-                'flex items-center gap-3',
-                isOpen ? 'justify-between' : 'justify-center',
-              ].join(' ')}
-            >
+            <div className={['flex items-center gap-3', isOpen ? 'justify-start' : 'justify-center'].join(' ')}>
               <span
                 className={
                   isOpen
                     ? ''
-                    : 'flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.03] text-xs font-semibold uppercase'
+                    : 'flex h-6 w-6 items-center justify-center rounded-md bg-slate-100 text-xs font-semibold uppercase'
                 }
               >
                 {isOpen ? item.label : item.label.charAt(0)}
               </span>
-              {isOpen && (
-                <span className="h-2 w-2 rounded-full bg-current opacity-40 group-hover:opacity-70" />
-              )}
             </div>
           </NavLink>
         ))}

@@ -151,6 +151,17 @@ export function normalizeLead(data: unknown): Lead {
     score: asNumber(record.score) ?? asNumber(record.leadScore) ?? asNumber(record.lead_score),
     grade: asString(record.grade) ?? asString(record.scoreGrade) ?? asString(record.score_grade),
     yield: asNumber(record.yield) ?? asNumber(record.rentalYield) ?? asNumber(record.rental_yield),
+    rentalEstimate:
+      asNumber(record.rentalEstimate) ??
+      asNumber(record.rental_estimate) ??
+      asNumber(record.estimatedRent) ??
+      asNumber(record.estimated_rent) ??
+      asNumber(listing?.rentalEstimate),
+    daysOnMarket:
+      asNumber(record.daysOnMarket) ??
+      asNumber(record.days_on_market) ??
+      asNumber(listing?.daysOnMarket) ??
+      asNumber(listing?.days_on_market),
     reasons,
     reasonsRaw,
     strategyScores,
