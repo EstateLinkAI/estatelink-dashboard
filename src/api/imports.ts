@@ -83,3 +83,29 @@ export async function getImportJob(jobId: string): Promise<ImportJob> {
 
   return normalizeImportJob(response.data)
 }
+
+function extractJobArray(data: unknown): unknown[] {
+  if (Array.isArray(data)) {
+    return data
+  }
+
+  const record = asRecord(data)
+  if (!record) {
+    return []
+  }
+
+  const listValue = record.jobs ?? record.items ?? record.data
+  return Array.isArray(listValue) ? listValue : []
+}
+
+export async function getImportJobs(limit = 20): Promise<ImportJob[]> {
+  const response = await apiClient.get('/api/imports', { params: { limit } })
+
+  return extractJobArray(response.data).map(normalizeImportJob)
+}
+
+export async function cancelImportJob(jobId: string): Promise<ImportJob> {
+  const response = await apiClient.post(`/api/imports/${jobId}/cancel`)
+
+  return normalizeImportJob(response.data)
+}
