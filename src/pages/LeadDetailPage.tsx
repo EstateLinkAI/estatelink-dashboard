@@ -25,6 +25,15 @@ function formatYield(value?: number) {
   return value != null ? `${value.toFixed(1)}%` : 'N/A'
 }
 
+function Field({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+      <p className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{label}</p>
+      <p className="mt-1 text-sm font-medium text-slate-900">{value}</p>
+    </div>
+  )
+}
+
 export function LeadDetailPage() {
   const { id } = useParams()
   const [lead, setLead] = useState<Lead | null>(null)
@@ -85,136 +94,88 @@ export function LeadDetailPage() {
   }
 
   return (
-    <div className="min-w-0 space-y-6">
-      <div>
-        <Link to="/app/leads" className="text-sm text-cyan-300 transition hover:text-cyan-200">
-          Back to Leads
-        </Link>
-      </div>
+    <div className="min-w-0 space-y-5">
+      <Link to="/app/leads" className="text-sm text-blue-700 transition hover:text-blue-800">
+        ← Back to leads
+      </Link>
 
-      <section className="min-w-0 rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:p-6">
-        <div className="flex min-w-0 flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+      <section className="min-w-0 rounded-md border border-slate-200 bg-white p-4 sm:p-5">
+        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300/75">
-              Intelligence Report
-            </p>
-            <h2 className="mt-3 break-words text-3xl font-semibold tracking-tight text-white">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-400">Deal memo</p>
+            <h2 className="mt-1 truncate text-xl font-semibold text-slate-900">
               {lead.title ?? lead.address ?? 'Property lead details'}
             </h2>
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-1 text-sm text-slate-500">
               {[lead.address, lead.city, lead.postcodeArea].filter(Boolean).join(' / ') || 'Property location not available'}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <ScorePill score={lead.score} className="px-3 py-1.5 text-base" />
-            <GradeBadge grade={lead.grade} className="px-3 py-1.5 text-sm" />
+          <div className="flex shrink-0 items-center gap-2">
+            <ScorePill score={lead.score} />
+            <GradeBadge grade={lead.grade} />
           </div>
         </div>
       </section>
 
-      <section className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-        <div className="min-w-0 space-y-6">
-          <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
-            <h3 className="text-xl font-semibold text-white">Property summary</h3>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Address</p>
-                <p className="mt-2 text-sm text-white">{lead.address ?? 'N/A'}</p>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">City</p>
-                <p className="mt-2 text-sm text-white">{lead.city ?? 'N/A'}</p>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Postcode area</p>
-                <p className="mt-2 text-sm text-white">{lead.postcodeArea ?? 'N/A'}</p>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Property type</p>
-                <p className="mt-2 text-sm text-white">{lead.propertyType ?? 'N/A'}</p>
-              </div>
+      <section className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        <div className="min-w-0 space-y-4">
+          <div className="rounded-md border border-slate-200 bg-white p-4">
+            <h3 className="text-sm font-semibold text-slate-900">Property summary</h3>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <Field label="Address" value={lead.address ?? 'N/A'} />
+              <Field label="City" value={lead.city ?? 'N/A'} />
+              <Field label="Postcode area" value={lead.postcodeArea ?? 'N/A'} />
+              <Field label="Property type" value={lead.propertyType ?? 'N/A'} />
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
-            <h3 className="text-xl font-semibold text-white">Investment metrics</h3>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Price</p>
-                <p className="mt-2 text-sm text-white">{formatCurrency(lead.price)}</p>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Bedrooms</p>
-                <p className="mt-2 text-sm text-white">{lead.bedrooms ?? 'N/A'}</p>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Yield</p>
-                <p className="mt-2 text-sm text-white">{formatYield(lead.yield)}</p>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Lead ID</p>
-                <p className="mt-2 break-all text-sm text-white">{lead.id ?? lead.listingId ?? 'N/A'}</p>
-              </div>
+          <div className="rounded-md border border-slate-200 bg-white p-4">
+            <h3 className="text-sm font-semibold text-slate-900">Listing details</h3>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <Field label="Price" value={formatCurrency(lead.price)} />
+              <Field label="Rental estimate" value={formatCurrency(lead.rentalEstimate)} />
+              <Field label="Bedrooms" value={lead.bedrooms != null ? String(lead.bedrooms) : 'N/A'} />
+              <Field label="Yield signal" value={formatYield(lead.yield)} />
+              <Field
+                label="Days on market"
+                value={lead.daysOnMarket != null ? `${lead.daysOnMarket} days` : 'N/A'}
+              />
+              <Field label="Lead ID" value={lead.id ?? lead.listingId ?? 'N/A'} />
             </div>
           </div>
         </div>
 
-        <div className="min-w-0 space-y-6">
-          <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
-            <h3 className="text-xl font-semibold text-white">Score overview</h3>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Score</p>
-                <div className="mt-3">
-                  <ScorePill score={lead.score} className="px-3 py-1.5 text-base" />
-                </div>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Grade</p>
-                <div className="mt-3">
-                  <GradeBadge grade={lead.grade} className="px-3 py-1.5 text-sm" />
-                </div>
-              </div>
+        <div className="min-w-0 space-y-4">
+          <div className="rounded-md border border-slate-200 bg-white p-4">
+            <h3 className="text-sm font-semibold text-slate-900">Source information</h3>
+            <div className="mt-3 grid gap-2">
+              <Field label="Source platform" value={lead.sourcePlatform ?? 'N/A'} />
+              <Field label="Listing title" value={lead.title ?? 'N/A'} />
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
-            <h3 className="text-xl font-semibold text-white">Source information</h3>
-            <div className="mt-6 grid gap-4">
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Source platform</p>
-                <p className="mt-2 text-sm text-white">{lead.sourcePlatform ?? 'N/A'}</p>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Listing title</p>
-                <p className="mt-2 text-sm text-white">{lead.title ?? 'N/A'}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
-            <h3 className="text-xl font-semibold text-white">Score reasons</h3>
-            <div className="mt-6">
+          <div className="rounded-md border border-slate-200 bg-white p-4">
+            <h3 className="text-sm font-semibold text-slate-900">Score reasons</h3>
+            <p className="mt-1 text-xs text-slate-500">Why this lead was scored the way it was.</p>
+            <div className="mt-3">
               <ScoreReasons reasons={lead.reasons} raw={lead.reasonsRaw ?? lead.reasons} />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="min-w-0 rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:p-6">
-        <h3 className="text-xl font-semibold text-white">Strategy scores</h3>
-        <p className="mt-2 text-sm leading-6 text-slate-400">
+      <section className="min-w-0 rounded-md border border-slate-200 bg-white p-4 sm:p-5">
+        <h3 className="text-sm font-semibold text-slate-900">Strategy fit</h3>
+        <p className="mt-1 text-sm text-slate-500">
           Investment strategy breakdown for this listing across acquisition models.
         </p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {STRATEGY_TYPES.map((strategy) => (
             <StrategyScoreCard
               key={strategy}
               strategy={strategy}
-              score={lead.strategyScores.find(
-                (item) => item.strategy?.trim().toLowerCase() === strategy,
-              )}
+              score={lead.strategyScores.find((item) => item.strategy?.trim().toLowerCase() === strategy)}
             />
           ))}
         </div>

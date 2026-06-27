@@ -2,27 +2,22 @@ interface StatCardProps {
   label: string
   value: string
   helper?: string
-  accent?: 'neutral' | 'emerald' | 'cyan' | 'amber'
+  accent?: 'neutral' | 'success' | 'accent' | 'warning'
 }
 
 const accentMap = {
-  neutral: 'border-white/10',
-  emerald: 'border-emerald-500/20',
-  cyan: 'border-cyan-400/20',
-  amber: 'border-amber-400/20',
+  neutral: 'border-l-slate-300',
+  success: 'border-l-emerald-600',
+  accent: 'border-l-blue-700',
+  warning: 'border-l-amber-600',
 }
 
 export function StatCard({ label, value, helper, accent = 'neutral' }: StatCardProps) {
   return (
-    <div
-      className={[
-        'rounded-2xl border bg-slate-900/75 p-5 shadow-[0_12px_40px_rgba(2,6,23,0.28)]',
-        accentMap[accent],
-      ].join(' ')}
-    >
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-      <p className="mt-4 text-3xl font-semibold tracking-tight text-white">{value}</p>
-      {helper ? <p className="mt-2 text-sm text-slate-400">{helper}</p> : null}
+    <div className={['rounded-md border border-slate-200 border-l-2 bg-white p-4', accentMap[accent]].join(' ')}>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</p>
+      <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">{value}</p>
+      {helper ? <p className="mt-1 text-xs text-slate-500">{helper}</p> : null}
     </div>
   )
 }

@@ -125,18 +125,13 @@ export function ActivityLogsPage() {
   }, [offset, isMountedRef])
 
   return (
-    <div className="min-w-0 space-y-6">
-      <section className="min-w-0 rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300/75">
-          Audit Trail
+    <div className="min-w-0 space-y-5">
+      <div className="min-w-0">
+        <h2 className="text-lg font-semibold text-slate-900">Activity logs</h2>
+        <p className="mt-0.5 text-sm text-slate-500">
+          Immutable backend audit events across users, entities, and request context.
         </p>
-        <h2 className="mt-3 break-words text-3xl font-semibold tracking-tight text-white">
-          Activity logs
-        </h2>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
-          Review immutable backend audit events across users, entities, and request context.
-        </p>
-      </section>
+      </div>
 
       {loading ? <LoadingState label="Loading activity logs..." rows={5} /> : null}
       {!loading && error ? <ErrorState message={error} /> : null}
@@ -148,7 +143,7 @@ export function ActivityLogsPage() {
       ) : null}
 
       {!loading && !error && logs.length > 0 ? (
-        <section className="rounded-2xl border border-white/10 bg-slate-900/70">
+        <section className="rounded-md border border-slate-200 bg-white">
           <div className="overflow-x-auto">
             <table className="min-w-[920px] w-full border-collapse text-left text-sm">
               <colgroup>
@@ -161,42 +156,37 @@ export function ActivityLogsPage() {
                 <col className="w-[17%]" />
                 <col className="w-[18%]" />
               </colgroup>
-              <thead className="bg-slate-950/80 text-xs uppercase tracking-[0.18em] text-slate-400">
+              <thead className="bg-slate-50 text-[11px] uppercase tracking-[0.08em] text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Created At</th>
-                  <th className="px-4 py-3 font-medium">Actor User ID</th>
-                  <th className="px-4 py-3 font-medium">Action</th>
-                  <th className="px-4 py-3 font-medium">Entity Type</th>
-                  <th className="px-4 py-3 font-medium">Entity ID</th>
-                  <th className="px-4 py-3 font-medium">IP Address</th>
-                  <th className="px-4 py-3 font-medium">User Agent</th>
-                  <th className="px-4 py-3 font-medium">Metadata</th>
+                  <th className="px-4 py-2.5 font-medium">Created At</th>
+                  <th className="px-4 py-2.5 font-medium">Actor User ID</th>
+                  <th className="px-4 py-2.5 font-medium">Action</th>
+                  <th className="px-4 py-2.5 font-medium">Entity Type</th>
+                  <th className="px-4 py-2.5 font-medium">Entity ID</th>
+                  <th className="px-4 py-2.5 font-medium">IP Address</th>
+                  <th className="px-4 py-2.5 font-medium">User Agent</th>
+                  <th className="px-4 py-2.5 font-medium">Metadata</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100">
                 {logs.map((log, index) => (
-                  <tr
-                    key={getRowKey(log, index, offset)}
-                    className="border-t border-white/8 align-top text-slate-200"
-                  >
-                    <td className="px-4 py-4 whitespace-nowrap">{formatCreatedAt(log.createdAt)}</td>
-                    <td className="px-4 py-4 break-words">{formatCell(log.actorUserId)}</td>
-                    <td className="px-4 py-4 break-words">{formatCell(log.action)}</td>
-                    <td className="px-4 py-4 break-words">{formatCell(log.entityType)}</td>
-                    <td className="px-4 py-4 break-words">{formatCell(log.entityId)}</td>
-                    <td className="px-4 py-4 break-words">{formatCell(log.ipAddress)}</td>
-                    <td className="px-4 py-4 text-slate-300">
-                      <div className="max-w-[18rem] break-words text-sm leading-6">
-                        {formatCell(log.userAgent)}
-                      </div>
+                  <tr key={getRowKey(log, index, offset)} className="align-top text-slate-600">
+                    <td className="px-4 py-3 whitespace-nowrap">{formatCreatedAt(log.createdAt)}</td>
+                    <td className="px-4 py-3 break-words">{formatCell(log.actorUserId)}</td>
+                    <td className="px-4 py-3 break-words">{formatCell(log.action)}</td>
+                    <td className="px-4 py-3 break-words">{formatCell(log.entityType)}</td>
+                    <td className="px-4 py-3 break-words">{formatCell(log.entityId)}</td>
+                    <td className="px-4 py-3 break-words">{formatCell(log.ipAddress)}</td>
+                    <td className="px-4 py-3 text-slate-500">
+                      <div className="max-w-[18rem] break-words text-sm leading-6">{formatCell(log.userAgent)}</div>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-4 py-3">
                       {!hasVisibleContent(log) ? (
-                        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300/80">
+                        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-amber-700">
                           Unmapped record shape
                         </p>
                       ) : null}
-                      <pre className="max-w-[20rem] whitespace-pre-wrap break-words rounded-xl border border-white/8 bg-slate-950/70 p-3 text-xs leading-6 text-cyan-100">
+                      <pre className="max-w-[20rem] whitespace-pre-wrap break-words rounded-sm border border-slate-200 bg-slate-50 p-2.5 text-xs leading-6 text-slate-600">
                         {formatMetadata(log.metadata)}
                       </pre>
                     </td>
@@ -206,16 +196,16 @@ export function ActivityLogsPage() {
             </table>
           </div>
 
-          <div className="flex flex-col gap-3 border-t border-white/10 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-slate-400">
+          <div className="flex flex-col gap-3 border-t border-slate-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-slate-500">
               Showing {offset + 1} to {offset + logs.length} with a page size of {PAGE_SIZE}.
             </p>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setOffset((current) => Math.max(0, current - PAGE_SIZE))}
                 disabled={offset === 0}
-                className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-white/20 hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-sm border border-slate-300 bg-white px-3.5 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Previous
               </button>
@@ -223,7 +213,7 @@ export function ActivityLogsPage() {
                 type="button"
                 onClick={() => setOffset((current) => current + PAGE_SIZE)}
                 disabled={!hasMore}
-                className="rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:border-cyan-400/40 hover:bg-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-sm bg-blue-700 px-3.5 py-1.5 text-sm font-medium text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Next
               </button>

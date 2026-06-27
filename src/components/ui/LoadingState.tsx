@@ -5,17 +5,14 @@ interface LoadingStateProps {
 
 export function LoadingState({ label = 'Loading data...', rows = 3 }: LoadingStateProps) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-6 text-slate-300">
-      <div className="flex items-center gap-3">
-        <div className="h-3 w-3 rounded-full bg-cyan-300" />
+    <div className="rounded-md border border-slate-200 bg-white p-5 text-slate-600">
+      <div className="flex items-center gap-2.5">
+        <div className="h-2 w-2 rounded-full bg-blue-700" />
         <p className="text-sm font-medium">{label}</p>
       </div>
-      <div className="mt-5 space-y-3">
+      <div className="mt-4 space-y-2">
         {Array.from({ length: rows }).map((_, index) => (
-          <div
-            key={index}
-            className="h-14 animate-pulse rounded-xl border border-white/8 bg-slate-950/60"
-          />
+          <div key={index} className="h-12 animate-pulse rounded-md border border-slate-100 bg-slate-50" />
         ))}
       </div>
     </div>

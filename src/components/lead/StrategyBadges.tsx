@@ -22,14 +22,14 @@ export function StrategyBadges({ lead, className = '' }: StrategyBadgesProps) {
   }
 
   return (
-    <div className={['flex flex-wrap items-center gap-2', className].join(' ')}>
+    <div className={['flex flex-wrap items-center gap-1.5', className].join(' ')}>
       {badges.map((badge) => (
         <span
           key={badge.strategy}
-          className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs font-medium text-slate-300"
+          className="inline-flex items-center gap-1.5 rounded-sm border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-600"
         >
           {STRATEGY_LABELS[badge.strategy]}
-          <span className="font-semibold text-cyan-200">{badge.score.toFixed(0)}</span>
+          <span className="font-semibold text-slate-900 tabular-nums">{badge.score.toFixed(0)}</span>
         </span>
       ))}
     </div>

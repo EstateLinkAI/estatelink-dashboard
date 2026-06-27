@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom'
-import type { Lead } from '../../types/lead'
+import { STRATEGY_LABELS, type Lead } from '../../types/lead'
 import { GradeBadge } from './GradeBadge'
 import { ScorePill } from './ScorePill'
-import { StrategyBadges } from './StrategyBadges'
 
 interface LeadCardProps {
   lead: Lead
@@ -22,44 +21,66 @@ function formatCurrency(value?: number) {
     : 'N/A'
 }
 
+function bestStrategy(lead: Lead) {
+  return [...lead.strategyScores]
+    .filter((item) => item.score != null)
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0]
+}
+
 export function LeadCard({ lead }: LeadCardProps) {
   const href = `/app/leads/${lead.id ?? lead.listingId ?? ''}`
   const title = lead.address ?? lead.title ?? 'Untitled property lead'
   const subtitle = [lead.city, lead.postcodeArea, lead.propertyType].filter(Boolean).join(' / ')
-  const meta = [lead.sourcePlatform, lead.bedrooms != null ? `${lead.bedrooms} bd` : undefined]
-    .filter(Boolean)
-    .join(' / ')
+  const topStrategy = bestStrategy(lead)
+  const topReason = lead.reasons[0]
 
   return (
-    <article className="min-w-0 rounded-2xl border border-white/10 bg-slate-950/65 p-5 transition hover:border-cyan-400/25 hover:bg-slate-950">
-      <div className="flex items-start justify-between gap-4">
+    <Link
+      to={href}
+      className="block min-w-0 rounded-md border border-slate-200 bg-white p-4 transition hover:border-blue-300 hover:shadow-sm"
+    >
+      <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="break-words text-lg font-semibold text-white">{title}</p>
-          <p className="mt-2 break-words text-sm text-slate-400">
-            {subtitle || 'Location and property metadata pending'}
-          </p>
-          <p className="mt-1 break-words text-xs uppercase tracking-[0.16em] text-slate-500">
-            {meta || 'Lead intelligence record'}
+          <p className="truncate text-sm font-semibold text-slate-900">{title}</p>
+          <p className="mt-0.5 truncate text-xs text-slate-500">
+            {subtitle || 'Location pending'}
           </p>
         </div>
-        <ScorePill score={lead.score} className="shrink-0" />
+        <div className="flex shrink-0 items-center gap-1.5">
+          <ScorePill score={lead.score} />
+          <GradeBadge grade={lead.grade} />
+        </div>
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <GradeBadge grade={lead.grade} />
-        <span className="text-sm text-slate-400">Yield {formatYield(lead.yield)}</span>
-        {lead.price != null ? (
-          <span className="text-sm text-slate-400">Price {formatCurrency(lead.price)}</span>
+      <div className="mt-3 grid grid-cols-3 gap-2 border-t border-slate-100 pt-3 text-xs">
+        <div>
+          <p className="text-slate-400">Price</p>
+          <p className="mt-0.5 font-medium text-slate-900">{formatCurrency(lead.price)}</p>
+        </div>
+        <div>
+          <p className="text-slate-400">Rent est.</p>
+          <p className="mt-0.5 font-medium text-slate-900">{formatCurrency(lead.rentalEstimate)}</p>
+        </div>
+        <div>
+          <p className="text-slate-400">Yield signal</p>
+          <p className="mt-0.5 font-medium text-slate-900">{formatYield(lead.yield)}</p>
+        </div>
+      </div>
+
+      <div className="mt-2 flex items-center justify-between gap-2 text-xs text-slate-500">
+        <span>
+          {lead.daysOnMarket != null ? `${lead.daysOnMarket}d on market` : 'Days on market unknown'}
+        </span>
+        {topStrategy?.strategy ? (
+          <span className="font-medium text-slate-700">
+            Best fit: {STRATEGY_LABELS[topStrategy.strategy as keyof typeof STRATEGY_LABELS] ?? topStrategy.strategy} ({topStrategy.score?.toFixed(0)})
+          </span>
         ) : null}
       </div>
 
-      <StrategyBadges lead={lead} className="mt-4" />
-
-      <div className="mt-5">
-        <Link to={href} className="text-sm font-medium text-cyan-300 transition hover:text-cyan-200">
-          View details
-        </Link>
-      </div>
-    </article>
+      {topReason ? (
+        <p className="mt-2 truncate border-t border-slate-100 pt-2 text-xs text-slate-500">{topReason}</p>
+      ) : null}
+    </Link>
   )
 }

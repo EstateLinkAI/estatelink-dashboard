@@ -12,20 +12,20 @@ export function StrategyScoreCard({ strategy, score }: StrategyScoreCardProps) {
   const label = STRATEGY_LABELS[strategy]
 
   return (
-    <div className="min-w-0 rounded-2xl border border-white/10 bg-slate-950/50 p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h4 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-300">{label}</h4>
+    <div className="min-w-0 rounded-md border border-slate-200 bg-white p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+        <h4 className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-600">{label}</h4>
         <div className="flex items-center gap-2">
           <ScorePill score={score?.score} />
           <GradeBadge grade={score?.grade} />
         </div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-3">
         {score ? (
           <ScoreReasons reasons={score.reasons} raw={score.reasonsRaw ?? score.reasons} />
         ) : (
-          <p className="text-sm text-slate-500">No {label.toLowerCase()} score available for this listing.</p>
+          <p className="text-sm text-slate-400">No {label.toLowerCase()} score available for this listing.</p>
         )}
       </div>
     </div>

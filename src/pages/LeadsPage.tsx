@@ -61,18 +61,13 @@ export function LeadsPage() {
   }
 
   return (
-    <div className="min-w-0 space-y-6">
-      <section className="min-w-0 rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300/75">
-          Lead Pipeline
+    <div className="min-w-0 space-y-5">
+      <div className="min-w-0">
+        <h2 className="text-lg font-semibold text-slate-900">Property opportunity screening</h2>
+        <p className="mt-0.5 text-sm text-slate-500">
+          Filter by geography, asset type, source, and minimum score to find due diligence priorities.
         </p>
-        <h2 className="mt-3 break-words text-3xl font-semibold tracking-tight text-white">
-          Property opportunity screening
-        </h2>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
-          Filter by geography, asset type, source, and minimum score to inspect the most relevant opportunities quickly.
-        </p>
-      </section>
+      </div>
 
       <LeadFilters form={form} onChange={setForm} onApply={applyFilters} onReset={resetFilters} />
 

@@ -4,26 +4,25 @@ interface GradeBadgeProps {
 }
 
 const gradeStyles: Record<string, string> = {
-  A: 'border-emerald-500/30 bg-emerald-500/12 text-emerald-200',
-  B: 'border-sky-500/30 bg-sky-500/12 text-sky-200',
-  C: 'border-amber-500/30 bg-amber-500/12 text-amber-200',
-  D: 'border-rose-500/30 bg-rose-500/12 text-rose-200',
-  F: 'border-rose-500/30 bg-rose-500/12 text-rose-200',
+  A: 'border-emerald-300 bg-emerald-50 text-emerald-800',
+  B: 'border-blue-300 bg-blue-50 text-blue-800',
+  C: 'border-amber-300 bg-amber-50 text-amber-800',
+  D: 'border-red-300 bg-red-50 text-red-800',
+  F: 'border-red-300 bg-red-50 text-red-800',
 }
 
 export function GradeBadge({ grade, className = '' }: GradeBadgeProps) {
   const normalized = grade?.trim().toUpperCase()
-  const tone = normalized
-    ? gradeStyles[normalized] ?? 'border-slate-600/60 bg-slate-800/70 text-slate-200'
-    : 'border-slate-600/60 bg-slate-800/70 text-slate-200'
+  const tone = normalized ? gradeStyles[normalized] ?? 'border-slate-300 bg-slate-50 text-slate-600' : 'border-slate-300 bg-slate-50 text-slate-600'
 
   return (
     <span
       className={[
-        'inline-flex min-w-10 items-center justify-center rounded-md border px-2.5 py-1 text-xs font-semibold tracking-[0.18em]',
+        'inline-flex min-w-7 items-center justify-center rounded-sm border px-1.5 py-0.5 text-xs font-semibold tracking-[0.06em]',
         tone,
         className,
       ].join(' ')}
+      title={normalized ? `Grade ${normalized}` : 'No grade'}
     >
       {normalized ?? 'N/A'}
     </span>
