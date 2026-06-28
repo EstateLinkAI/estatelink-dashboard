@@ -66,3 +66,17 @@ export interface LeadsFilters {
   limit?: number
   offset?: number
 }
+
+export interface LeadsPagination {
+  limit: number
+  offset: number
+  total: number
+  returned: number
+  hasNext: boolean
+  hasPrevious: boolean
+}
+
+export interface LeadsResult {
+  leads: Lead[]
+  pagination: LeadsPagination
+}

@@ -6,24 +6,31 @@ import {
   LeadFilters,
   type LeadFilterFormState,
 } from '../components/lead/LeadFilters'
+import { LeadPagination } from '../components/lead/LeadPagination'
 import { LeadTable } from '../components/lead/LeadTable'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { useIsMountedRef } from '../hooks/useIsMountedRef'
-import type { Lead, LeadsFilters } from '../types/lead'
+import type { Lead, LeadsFilters, LeadsPagination as LeadsPaginationData } from '../types/lead'
+
+const DEFAULT_LIMIT = 20
 
 export function LeadsPage() {
   const [form, setForm] = useState<LeadFilterFormState>(initialLeadFilterForm)
   const [appliedFilters, setAppliedFilters] = useState<LeadsFilters>({})
+  const [limit, setLimit] = useState(DEFAULT_LIMIT)
+  const [offset, setOffset] = useState(0)
   const [leads, setLeads] = useState<Lead[]>([])
+  const [pagination, setPagination] = useState<LeadsPaginationData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const lastFetchKeyRef = useRef<string | null>(null)
   const isMountedRef = useIsMountedRef()
 
   useEffect(() => {
-    const fetchKey = JSON.stringify(appliedFilters)
+    const requestFilters: LeadsFilters = { ...appliedFilters, limit, offset }
+    const fetchKey = JSON.stringify(requestFilters)
     if (lastFetchKeyRef.current === fetchKey) {
       return
     }
@@ -33,10 +40,11 @@ export function LeadsPage() {
     setLoading(true)
     setError(null)
 
-    getLeads(appliedFilters)
-      .then((data) => {
+    getLeads(requestFilters)
+      .then((result) => {
         if (isMountedRef.current) {
-          setLeads(data)
+          setLeads(result.leads)
+          setPagination(result.pagination)
         }
       })
       .catch(() => {
@@ -49,16 +57,35 @@ export function LeadsPage() {
           setLoading(false)
         }
       })
-  }, [appliedFilters, isMountedRef])
+  }, [appliedFilters, limit, offset, isMountedRef])
 
   const applyFilters = () => {
     setAppliedFilters(createLeadFilters(form))
+    setOffset(0)
   }
 
   const resetFilters = () => {
     setForm(initialLeadFilterForm)
     setAppliedFilters({})
+    setOffset(0)
   }
+
+  const handlePrevious = () => {
+    setOffset((current) => Math.max(0, current - limit))
+  }
+
+  const handleNext = () => {
+    setOffset((current) => current + limit)
+  }
+
+  const handleLimitChange = (nextLimit: number) => {
+    setLimit(nextLimit)
+    setOffset(0)
+  }
+
+  const hasLeads = leads.length > 0
+  const showInitialLoading = loading && !hasLeads && !error
+  const showInitialError = Boolean(error) && !hasLeads
 
   return (
     <div className="min-w-0 space-y-5">
@@ -71,15 +98,35 @@ export function LeadsPage() {
 
       <LeadFilters form={form} onChange={setForm} onApply={applyFilters} onReset={resetFilters} />
 
-      {loading ? <LoadingState label="Loading leads..." rows={5} /> : null}
-      {!loading && error ? <ErrorState message={error} /> : null}
-      {!loading && !error && leads.length === 0 ? (
-        <EmptyState
-          title="No leads found"
-          description="Try broadening the filters or resetting them to view more opportunities."
-        />
+      {showInitialLoading ? <LoadingState label="Loading leads..." rows={5} /> : null}
+      {showInitialError ? <ErrorState message={error ?? 'Unable to load leads.'} /> : null}
+
+      {!showInitialLoading && !showInitialError ? (
+        <>
+          {error ? <ErrorState message={error} /> : null}
+          {!loading && !hasLeads && !error ? (
+            <EmptyState
+              title="No leads found"
+              description="Try broadening the filters or resetting them to view more opportunities."
+            />
+          ) : null}
+          {hasLeads ? (
+            <>
+              <LeadTable leads={leads} loading={loading} />
+              {pagination ? (
+                <LeadPagination
+                  pagination={pagination}
+                  limit={limit}
+                  loading={loading}
+                  onPrevious={handlePrevious}
+                  onNext={handleNext}
+                  onLimitChange={handleLimitChange}
+                />
+              ) : null}
+            </>
+          ) : null}
+        </>
       ) : null}
-      {!loading && !error && leads.length > 0 ? <LeadTable leads={leads} /> : null}
     </div>
   )
 }

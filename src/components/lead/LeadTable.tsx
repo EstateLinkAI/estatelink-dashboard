@@ -6,6 +6,7 @@ import { StrategyBadges } from './StrategyBadges'
 
 interface LeadTableProps {
   leads: Lead[]
+  loading?: boolean
 }
 
 function formatCurrency(value?: number) {
@@ -32,11 +33,15 @@ function bestStrategy(lead: Lead) {
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0]
 }
 
-export function LeadTable({ leads }: LeadTableProps) {
+export function LeadTable({ leads, loading }: LeadTableProps) {
   const navigate = useNavigate()
 
   return (
-    <section className="min-w-0 overflow-hidden rounded-md border border-slate-200 bg-white">
+    <section
+      className={`min-w-0 overflow-hidden rounded-md border border-slate-200 bg-white transition-opacity ${
+        loading ? 'opacity-60' : ''
+      }`}
+    >
       <div className="border-b border-slate-200 bg-slate-50 px-4 py-3 sm:px-5">
         <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-sm font-semibold text-slate-900">Ranked property opportunities</h3>
