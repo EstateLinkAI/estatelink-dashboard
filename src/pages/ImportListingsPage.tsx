@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import axios from 'axios'
 import { Link } from 'react-router-dom'
 import {
   cancelImportJob,
@@ -12,6 +13,24 @@ import { useIsMountedRef } from '../hooks/useIsMountedRef'
 const ACTIVE_JOB_STORAGE_KEY = 'estatelink:active-import-job-id'
 const JOB_LIST_POLL_MS = 4000
 const ACTIVE_JOB_POLL_MS = 1500
+
+const MAX_IMPORT_ROWS = Number(import.meta.env.VITE_MAX_IMPORT_ROWS) || 5000
+
+const GENERIC_IMPORT_TOO_LARGE_MESSAGE =
+  'This import is too large for the server to accept. Please split the file into smaller batches.'
+
+function extractBackendErrorMessage(error: unknown): string | null {
+  if (!axios.isAxiosError(error)) return null
+
+  const status = error.response?.status
+  if (status !== 400 && status !== 413) return null
+
+  const data = error.response?.data
+  const record = data && typeof data === 'object' && !Array.isArray(data) ? (data as Record<string, unknown>) : undefined
+  const message = record?.message ?? record?.error ?? record?.detail
+
+  return typeof message === 'string' && message.trim() ? message : GENERIC_IMPORT_TOO_LARGE_MESSAGE
+}
 
 function parseListingsFile(text: string): unknown[] {
   const trimmed = text.trim()
@@ -49,6 +68,15 @@ const stageStyles: Record<string, string> = {
 
 const CANCELLABLE_STATUSES = new Set(['queued', 'processing'])
 
+// Any status other than a terminal one counts as "active" for polling purposes, so
+// backend status names like pending/running/cancelling keep updates live without
+// the frontend needing to hardcode every in-progress status string.
+const TERMINAL_JOB_STATUSES = new Set(['completed', 'failed', 'cancelled'])
+
+function hasActiveJob(jobsList: ImportJob[]) {
+  return jobsList.some((listJob) => !TERMINAL_JOB_STATUSES.has(listJob.status))
+}
+
 function StageBadge({ status }: { status: string }) {
   const tone = stageStyles[status] ?? 'border-slate-300 bg-slate-50 text-slate-600'
   return (
@@ -70,8 +98,11 @@ export function ImportListingsPage() {
   const [jobs, setJobs] = useState<ImportJob[]>([])
   const [jobsError, setJobsError] = useState('')
   const [cancellingJobIds, setCancellingJobIds] = useState<Set<string>>(new Set())
+  const [isRefreshingJobs, setIsRefreshingJobs] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const activeJobIdRef = useRef<string | null>(null)
+  const jobsPollTimeoutRef = useRef<number | undefined>(undefined)
+  const jobsHaveActiveRef = useRef(true)
   const isMountedRef = useIsMountedRef()
 
   function resetFileInput() {
@@ -99,6 +130,14 @@ export function ImportListingsPage() {
         return
       }
 
+      if (parsed.length > MAX_IMPORT_ROWS) {
+        setError(
+          `This import contains ${parsed.length.toLocaleString()} listings. The maximum per upload is ` +
+            `${MAX_IMPORT_ROWS.toLocaleString()}. Please split the file into smaller batches.`,
+        )
+        return
+      }
+
       setPendingListings(parsed)
     } catch {
       setError('Could not read file. Please check the JSON/NDJSON format.')
@@ -111,7 +150,7 @@ export function ImportListingsPage() {
   }
 
   async function confirmImport() {
-    if (!pendingListings) return
+    if (!pendingListings || isImporting) return
 
     setIsImporting(true)
     setError('')
@@ -129,8 +168,8 @@ export function ImportListingsPage() {
       setActiveJobId(result.jobId)
       window.localStorage.setItem(ACTIVE_JOB_STORAGE_KEY, result.jobId)
       refreshJobsList()
-    } catch {
-      setError('Could not start import. Please check the JSON/NDJSON format.')
+    } catch (err) {
+      setError(extractBackendErrorMessage(err) ?? 'Could not start import. Please check the JSON/NDJSON format.')
     } finally {
       setIsImporting(false)
     }
@@ -165,19 +204,51 @@ export function ImportListingsPage() {
     }
   }
 
-  function refreshJobsList() {
-    getImportJobs(20)
-      .then((data) => {
-        if (isMountedRef.current) {
-          setJobs(data)
-          setJobsError('')
-        }
-      })
-      .catch(() => {
-        if (isMountedRef.current) {
-          setJobsError('Unable to load recent import jobs right now.')
-        }
-      })
+  function clearJobsPollTimeout() {
+    if (jobsPollTimeoutRef.current !== undefined) {
+      window.clearTimeout(jobsPollTimeoutRef.current)
+      jobsPollTimeoutRef.current = undefined
+    }
+  }
+
+  // Self-scheduling refresh: fetches the list once, then only reschedules itself if an
+  // active job remains, so polling stops automatically once every job has finished.
+  // Always clearing the pending timeout first means any caller (mount, manual refresh,
+  // confirmImport, cancel) resets the same single timer instead of stacking duplicates.
+  async function refreshJobsList() {
+    try {
+      const data = await getImportJobs(20)
+
+      if (!isMountedRef.current) return
+
+      setJobs(data)
+      setJobsError('')
+      jobsHaveActiveRef.current = hasActiveJob(data)
+    } catch {
+      if (isMountedRef.current) {
+        setJobsError('Unable to load recent import jobs right now.')
+      }
+      // Leave jobsHaveActiveRef as-is: a transient fetch error shouldn't stop live
+      // updates for a job we already know is active.
+    }
+
+    clearJobsPollTimeout()
+    if (isMountedRef.current && jobsHaveActiveRef.current) {
+      jobsPollTimeoutRef.current = window.setTimeout(refreshJobsList, JOB_LIST_POLL_MS)
+    }
+  }
+
+  async function handleManualJobsRefresh() {
+    if (isRefreshingJobs) return
+
+    setIsRefreshingJobs(true)
+    try {
+      await refreshJobsList()
+    } finally {
+      if (isMountedRef.current) {
+        setIsRefreshingJobs(false)
+      }
+    }
   }
 
   // Poll the active job (started here or resumed from a previous visit) until it finishes.
@@ -223,11 +294,13 @@ export function ImportListingsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeJobId, isMountedRef])
 
-  // Recent jobs list: shows every import's current processing stage, independent of this tab's session.
+  // Recent jobs list: shows every import's current processing stage, independent of this tab's
+  // session. Polls only while this page is mounted and only while a job is still in progress.
   useEffect(() => {
     refreshJobsList()
-    const intervalId = window.setInterval(refreshJobsList, JOB_LIST_POLL_MS)
-    return () => window.clearInterval(intervalId)
+    return () => {
+      clearJobsPollTimeout()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -244,6 +317,12 @@ export function ImportListingsPage() {
         <p className="mt-0.5 max-w-2xl text-sm text-slate-500">
           Upload a clean JSON or NDJSON file from your scraper. EstateLink will store the raw payload, normalise
           each listing, score the opportunity, and make it available in the lead dashboard.
+        </p>
+        <p className="mt-1.5 text-sm font-medium text-slate-700">
+          Maximum import size: {MAX_IMPORT_ROWS.toLocaleString()} listings per upload.
+        </p>
+        <p className="mt-0.5 text-xs text-slate-400">
+          Large files should be split into batches. Automatic chunked upload can be added later.
         </p>
       </div>
 
@@ -374,12 +453,22 @@ export function ImportListingsPage() {
       </div>
 
       <div className="min-w-0 rounded-md border border-slate-200 bg-white">
-        <div className="border-b border-slate-200 px-4 py-3">
-          <h3 className="text-sm font-semibold text-slate-900">Recent import jobs</h3>
-          <p className="mt-0.5 text-xs text-slate-500">
-            Every import runs as a background job on the server, so this list stays accurate even if you switch
-            pages or close this tab.
-          </p>
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 px-4 py-3">
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-slate-900">Recent import jobs</h3>
+            <p className="mt-0.5 text-xs text-slate-500">
+              Every import runs as a background job on the server, so this list stays accurate even if you switch
+              pages or close this tab.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleManualJobsRefresh}
+            disabled={isRefreshingJobs}
+            className="rounded-sm border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isRefreshingJobs ? 'Refreshing...' : 'Refresh'}
+          </button>
         </div>
 
         {jobsError ? (

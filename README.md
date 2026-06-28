@@ -65,6 +65,7 @@ npm run preview
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
 | `VITE_API_BASE_URL` | No | `http://localhost:8080` | Base URL for the Go API. |
+| `VITE_MAX_IMPORT_ROWS` | No | `5000` | Maximum listings allowed per import upload. Must stay in sync with the backend's `MAX_IMPORT_ROWS` limit. |
 
 ## Routes
 
