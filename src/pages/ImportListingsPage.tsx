@@ -51,6 +51,12 @@ function parseListingsFile(text: string): unknown[] {
     .map((line) => JSON.parse(line))
 }
 
+function buildFailedImportSummary(failed: number, errorMessage?: string) {
+  const rowsPart = failed > 0 ? `${failed.toLocaleString()} row${failed === 1 ? '' : 's'} failed.` : null
+  const reasonPart = errorMessage ?? 'All listings failed to import.'
+  return [rowsPart, reasonPart].filter(Boolean).join(' ')
+}
+
 function formatDateTime(value?: string) {
   if (!value) return '-'
   const parsed = new Date(value)
@@ -443,9 +449,10 @@ export function ImportListingsPage() {
               </div>
             </div>
 
-            {job?.errorMessage && (
+            {status === 'failed' && (
               <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-                {job.errorMessage}
+                <p className="font-semibold">Import failed</p>
+                <p className="mt-1">{buildFailedImportSummary(failed, job?.errorMessage)}</p>
               </div>
             )}
           </div>
