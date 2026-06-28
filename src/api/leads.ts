@@ -1,5 +1,7 @@
 import { apiClient } from './client'
-import type { Lead, LeadsFilters, StrategyScore } from '../types/lead'
+import type { Lead, LeadsFilters, LeadsPagination, LeadsResult, StrategyScore } from '../types/lead'
+
+const DEFAULT_LEADS_LIMIT = 20
 
 function asRecord(value: unknown): Record<string, unknown> | undefined {
   return value && typeof value === 'object' ? (value as Record<string, unknown>) : undefined
@@ -183,6 +185,25 @@ function extractLeadArray(data: unknown): unknown[] {
   return Array.isArray(listValue) ? listValue : []
 }
 
+function normalizePagination(
+  data: unknown,
+  fallbackLimit: number,
+  fallbackOffset: number,
+  returnedCount: number,
+): LeadsPagination {
+  const record = asRecord(data)
+
+  const limit = asNumber(record?.limit) ?? fallbackLimit
+  const offset = asNumber(record?.offset) ?? fallbackOffset
+  const returned = asNumber(record?.returned) ?? returnedCount
+  const total = asNumber(record?.total) ?? offset + returned
+
+  const hasNext = typeof record?.hasNext === 'boolean' ? record.hasNext : offset + returned < total
+  const hasPrevious = typeof record?.hasPrevious === 'boolean' ? record.hasPrevious : offset > 0
+
+  return { limit, offset, total, returned, hasNext, hasPrevious }
+}
+
 function toQueryParams(filters?: LeadsFilters) {
   if (!filters) {
     return undefined
@@ -193,12 +214,18 @@ function toQueryParams(filters?: LeadsFilters) {
   )
 }
 
-export async function getLeads(filters?: LeadsFilters): Promise<Lead[]> {
+export async function getLeads(filters?: LeadsFilters): Promise<LeadsResult> {
+  const limit = filters?.limit ?? DEFAULT_LEADS_LIMIT
+  const offset = filters?.offset ?? 0
+
   const response = await apiClient.get('/api/leads', {
-    params: toQueryParams(filters),
+    params: toQueryParams({ ...filters, limit, offset }),
   })
 
-  return extractLeadArray(response.data).map(normalizeLead)
+  const leads = extractLeadArray(response.data).map(normalizeLead)
+  const pagination = normalizePagination(asRecord(response.data)?.pagination, limit, offset, leads.length)
+
+  return { leads, pagination }
 }
 
 export async function getLeadById(id: string): Promise<Lead> {

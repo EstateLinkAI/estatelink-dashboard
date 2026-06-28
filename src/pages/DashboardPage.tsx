@@ -54,9 +54,9 @@ export function DashboardPage() {
     setError(null)
 
     getLeads()
-      .then((data) => {
+      .then((result) => {
         if (isMountedRef.current) {
-          setLeads(data)
+          setLeads(result.leads)
           setUpdatedAt(new Date().toLocaleString('en-GB'))
         }
       })
