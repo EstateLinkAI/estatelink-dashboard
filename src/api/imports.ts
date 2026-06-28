@@ -59,7 +59,16 @@ function normalizeImportJob(data: unknown): ImportJob {
     totalCount: asNumber(record.totalCount ?? record.total_count),
     processedCount: asNumber(record.processedCount ?? record.processed_count),
     failedCount: asNumber(record.failedCount ?? record.failed_count),
-    errorMessage: asString(record.errorMessage ?? record.error_message),
+    errorMessage: asString(
+      record.failureReason ??
+        record.failure_reason ??
+        record.failureSummary ??
+        record.failure_summary ??
+        record.mostCommonError ??
+        record.most_common_error ??
+        record.errorMessage ??
+        record.error_message,
+    ),
     createdAt: asString(record.createdAt ?? record.created_at) ?? '',
     startedAt: asString(record.startedAt ?? record.started_at),
     completedAt: asString(record.completedAt ?? record.completed_at),
